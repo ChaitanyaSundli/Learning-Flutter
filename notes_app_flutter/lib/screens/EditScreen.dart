@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../cubit/notes_cubit.dart';
 import '../models/CreateNoteRequest.dart';
 import '../services/ApiClient.dart';
@@ -170,7 +171,7 @@ class _EditScreenState extends State<EditScreen> {
                             widget.id,
                             updateNote,
                           );
-                          if (mounted) Navigator.pop(context, true);
+                          if (mounted) context.pop(true);
                         }
                       },
                       child: Text(

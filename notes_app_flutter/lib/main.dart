@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:notes_app_flutter/routing/note_routes.dart';
 import 'package:notes_app_flutter/screens/HomeScreen.dart';
 
 import 'cubit/notes_cubit.dart';
@@ -16,7 +17,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       title: 'Notes App',
-      routes: {"/": (_) => HomeScreen()},
+      routerConfig: router,
     );
   }
 }

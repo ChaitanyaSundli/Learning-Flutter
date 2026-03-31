@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../cubit/notes_cubit.dart';
 import '../services/ApiClient.dart';
@@ -74,23 +75,18 @@ class _DetailScreenState extends State<DetailScreen> {
             icon: const Icon(Icons.delete),
             onPressed: () async {
               await cubit.deleteNote(widget.id);
-              Navigator.pop(context, true);
+              context.pop();
             },
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          final updated = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => EditScreen(id: widget.id),
-            ),
-          );
+          final updated = await context.push<bool>('/edit/${widget.id}');
 
           if (updated == true) {
             cubit.loadNotes();
-            _loadNote(); 
+            _loadNote();
           }
         },
         label: const Text("Edit"),
@@ -109,7 +105,7 @@ class _DetailScreenState extends State<DetailScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                
+
                 TextFormField(
                   initialValue: title,
                   readOnly: true,
@@ -119,7 +115,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                
+
                 TextFormField(
                   initialValue: category,
                   readOnly: true,
@@ -129,19 +125,19 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                
+
                 SwitchListTile(
                   title: const Text(
                     "Pin Note",
                   ),
                   activeColor: Colors.orangeAccent,
                   value: isPinned,
-                  onChanged: null, 
+                  onChanged: null,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 12),
 
-                
+
                 TextFormField(
                   initialValue: message,
                   readOnly: true,
@@ -152,7 +148,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                
+
                 Row(
                   children: [
                     Expanded(

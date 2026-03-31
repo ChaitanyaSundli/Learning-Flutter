@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../cubit/notes_cubit.dart';
 import '../cubit/notes_state.dart';
 import 'CreateScreen.dart';
@@ -43,10 +44,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       appBar: AppBar(title: const Text("My Notes")),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          final created = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => CreateScreen()),
-          );
+          final created = await context.push<bool>('/create');
+
           if (created == true) {
             cubit.loadNotes();
           }
@@ -78,7 +77,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
               },
             ),
           ),
-          
+
           Expanded(
             child: BlocBuilder<NotesCubit, NotesState>(
               builder: (_, state) {
@@ -106,12 +105,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                             ),
                             trailing: note.isPinned ? const Icon(Icons.push_pin, color: Colors.orange) : null,
                             onTap: () async {
-                              final deleted = await Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => DetailScreen(id: note.id)),
-                              );
+                              final deleted = await context.push<bool>('/details/${note.id}');
                               if (deleted == true) {
-                                cubit.loadNotes(); 
+                                cubit.loadNotes();
                               }
                             },
                           ),

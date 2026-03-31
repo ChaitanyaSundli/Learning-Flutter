@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../cubit/notes_cubit.dart';
 import '../models/CreateNoteRequest.dart';
 
 class CreateScreen extends StatefulWidget {
+  const CreateScreen({super.key});
+
   @override
   State<CreateScreen> createState() => _CreateScreenState();
 }
@@ -35,7 +38,7 @@ class _CreateScreenState extends State<CreateScreen> {
       reminderAt: selectedDate?.toIso8601String(),
     );
     await cubit.createNote(note);
-    Navigator.pop(context, true);
+    context.pop();
   }
 
   @override
