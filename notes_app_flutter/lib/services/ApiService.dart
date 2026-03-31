@@ -1,32 +1,34 @@
 import 'package:dio/dio.dart';
+import 'package:notes_app_flutter/models/CreateNoteRequest.dart';
+import 'package:notes_app_flutter/models/NoteListItem.dart';
+import 'package:retrofit/retrofit.dart';
 
-class ApiService {
-  final Dio dio;
+import '../models/Note.dart';
 
-  ApiService(this.dio);
+part 'ApiService.g.dart';
 
-  Future<List<dynamic>> getNotes() async {
-    final res = await dio.get("/notes/list_items");
-    return res.data;
-  }
+@RestApi(baseUrl: "http://172.30.1.152:3000")
+abstract class ApiService {
+  factory ApiService(Dio dio, {String baseUrl}) = _ApiService;
 
-  Future<Map<String, dynamic>> getNote(int id) async {
-    final res = await dio.get("/notes/$id");
-    return res.data;
-  }
+  @GET("/notes/list_items")
+  Future<List<NoteListItem>> getNotes();
 
-  Future<void> createNote(Map<String, dynamic> body) async {
-    await dio.post("/notes", data: body);
-  }
+  @GET("/notes/{id}")
+  Future<Note> getNote(@Path("id") int id);
 
-  Future<void> deleteNote(int id) async {
-    await dio.delete("/notes/$id");
-  }
-  Future<Response> filterNotes(String category) {
-    return dio.get("/notes/filter/$category");
-  }
+  @POST("/notes")
+  Future<void> createNote(@Body() CreateNoteRequest body);
 
-  Future<Response> getCategories() {
-    return dio.get("/notes/categories");
-  }
+  @DELETE("/notes/{id}")
+  Future<void> deleteNote(@Path("id") int id);
+
+  @GET("/notes/filter/{category}")
+  Future<List<NoteListItem>> filterNotes(@Path("category") String category);
+
+  @GET("/notes/categories")
+  Future<List<String>> getCategories();
+
+  @PATCH("/notes/{id}")
+  Future<void> updateNote(@Path("id") int id, @Body() CreateNoteRequest body);
 }

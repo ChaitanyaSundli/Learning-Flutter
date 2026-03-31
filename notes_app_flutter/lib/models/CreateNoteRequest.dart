@@ -1,9 +1,17 @@
+import 'package:json_annotation/json_annotation.dart';
+part 'CreateNoteRequest.g.dart';
+
+@JsonSerializable()
 class CreateNoteRequest {
-  String title;
-  String message;
-  bool isPinned;
-  String category;
-  String? reminderAt;
+  final String? title;
+  final String? message;
+
+  @JsonKey(name: "is_pinned")
+  final bool? isPinned;
+
+  final String? category;
+  @JsonKey(name: "reminder_at")
+  final String? reminderAt;
 
   CreateNoteRequest({
     required this.title,
@@ -13,11 +21,8 @@ class CreateNoteRequest {
     this.reminderAt,
   });
 
-  Map<String, dynamic> toJson() => {
-    "title": title,
-    "message": message,
-    "is_pinned": isPinned,
-    "category": category,
-    "reminder_at": reminderAt,
-  };
+  factory CreateNoteRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateNoteRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CreateNoteRequestToJson(this);
 }

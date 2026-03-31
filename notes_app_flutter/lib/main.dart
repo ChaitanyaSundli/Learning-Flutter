@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:json_serializer/json_serializer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app_flutter/screens/HomeScreen.dart';
 
-import 'models/Note.dart';
+import 'cubit/notes_cubit.dart';
 
 void main() {
-  JsonSerializer.options = JsonSerializerOptions(
-    types: [UserType<Note>(Note.new)],
+  runApp(
+    BlocProvider(
+      create: (_) => NotesCubit()..loadNotes(),
+      child: MyApp(),
+    ),
   );
-
-  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

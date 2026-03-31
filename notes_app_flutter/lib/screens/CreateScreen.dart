@@ -1,112 +1,96 @@
 import 'package:flutter/material.dart';
-
-import '../services/ApiClient.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/notes_cubit.dart';
+import '../models/CreateNoteRequest.dart';
 
 class CreateScreen extends StatefulWidget {
   @override
-  _CreateScreenState createState() => _CreateScreenState();
+  State<CreateScreen> createState() => _CreateScreenState();
 }
 
 class _CreateScreenState extends State<CreateScreen> {
-  final api = ApiClient.api;
   final titleController = TextEditingController();
   final messageController = TextEditingController();
-  var isPinned = false;
+  final categoryController = TextEditingController();
+  bool isPinned = false;
   DateTime? selectedDate;
 
   Future<void> _selectDate() async {
-    final DateTime? pickedDate = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2021, 7, 25),
+      initialDate: DateTime.now(),
       firstDate: DateTime(2021),
-      lastDate: DateTime(2022),
+      lastDate: DateTime(2030),
     );
-
-    setState(() {
-      selectedDate = pickedDate;
-    });
+    if (picked != null) setState(() => selectedDate = picked);
   }
 
-  void save() async {
-    await api.createNote({
-      "note": {
-        "title": titleController.text,
-        "message": messageController.text,
-      },
-    });
-
-    Navigator.pop(context);
-  }
-
-  Color getColor(Set<WidgetState> states) {
-    const Set<WidgetState> interactiveStates = <WidgetState>{
-      WidgetState.pressed,
-      WidgetState.hovered,
-      WidgetState.focused,
-    };
-    if (states.any(interactiveStates.contains)) {
-      return Theme.of(context).colorScheme.surfaceContainerHighest;
-    }
-    return Theme.of(context).colorScheme.surfaceContainerLowest;
+  void _saveNote() async {
+    final cubit = context.read<NotesCubit>();
+    final note = CreateNoteRequest(
+      title: titleController.text,
+      message: messageController.text,
+      isPinned: isPinned,
+      category: categoryController.text,
+      reminderAt: selectedDate?.toIso8601String(),
+    );
+    await cubit.createNote(note);
+    Navigator.pop(context, true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Note Details"),
-        centerTitle: true,
-        actions: [],
-      ),
+      appBar: AppBar(title: const Text("Create Note")),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 controller: titleController,
-                decoration: InputDecoration(labelText: "Title"),
+                decoration: const InputDecoration(labelText: "Title"),
               ),
+              const SizedBox(height: 12),
               TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: "Category"),
+                controller: categoryController,
+                decoration: const InputDecoration(labelText: "Category"),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: messageController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: "Message",
+                  alignLabelWithHint: true,
+                ),
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
-                  Transform.scale(
-                    scale: 1.5,
-                    child: Checkbox(
-                      checkColor: Colors.white,
-                      fillColor: WidgetStateProperty.resolveWith(getColor),
-                      value: isPinned,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isPinned = value!;
-                        });
-                      },
+                  Checkbox(
+                    value: isPinned,
+                    onChanged: (val) => setState(() => isPinned = val ?? false),
+                  ),
+                  const Text("Pin Note"),
+                  const Spacer(),
+                  OutlinedButton.icon(
+                    onPressed: _selectDate,
+                    icon: const Icon(Icons.calendar_month),
+                    label: Text(
+                      selectedDate != null
+                          ? "${selectedDate!.toLocal()}".split(' ')[0]
+                          : "Add Reminder",
                     ),
                   ),
-                  Text("Pin Note"),
                 ],
               ),
-              OutlinedButton.icon(
-                onPressed: _selectDate,
-                icon: const Icon(Icons.calendar_month),
-                label: const Text('Add Reminder'),
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerHighest,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saveNote,
+                  child: const Text("Save Note"),
                 ),
               ),
             ],

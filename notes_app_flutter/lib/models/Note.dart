@@ -1,12 +1,26 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'Note.g.dart';
+
+@JsonSerializable()
 class Note {
-  int id;
-  String title;
-  String message;
-  bool isPinned;
-  String category;
-  String? reminderAt;
-  String createdAt;
-  String updatedAt;
+  final int id;
+  final String title;
+  final String message;
+
+  @JsonKey(name: "is_pinned")
+  final bool isPinned;
+
+  final String category;
+
+  @JsonKey(name: "reminder_at")
+  final String? reminderAt;
+
+  @JsonKey(name: "created_at")
+  final String createdAt;
+
+  @JsonKey(name: "updated_at")
+  final String updatedAt;
 
   Note({
     required this.id,
@@ -18,4 +32,7 @@ class Note {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);
+  Map<String, dynamic> toJson() => _$NoteToJson(this);
 }
